@@ -1,0 +1,17 @@
+# Local secrets and environment files
+.env
+.env.*
+credentials
+backup.json
+db_config.json
+
+# Local runtime data
+/db.sqlite3
+/media/
+/staticfiles/
+/venv/
+/.qodo/
+
+# Python cache
+__pycache__/
+*.py[cod]

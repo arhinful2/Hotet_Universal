@@ -12,6 +12,6 @@ django-allauth==0.54.0
 django-cors-headers==4.2.0
 whitenoise==6.5.0
 gunicorn==20.1.0
-psycopg2-binary==2.9.6
+psycopg2-binary==2.9.12
 django-storages==1.13.2
 boto3==1.28.0
