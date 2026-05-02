@@ -1,0 +1,166 @@
+{% extends "admin/change_form.html" %} 
+{% block submit_buttons_bottom %} {{ b
+  lock.super }} {% if change and original %}
+<div class="submit-row" style="display: block; margin-top: 12px">
+  <label
+    for="admin_reply"
+    style="display: block; font-weight: 600; margin-bottom: 6px"
+    >Quick reply</label
+  >
+  <textarea
+    id="admin_reply"
+    name="admin_reply"
+    rows="5"
+    style="width: 100%; margin-bottom: 8px"
+    placeholder="Type your reply message"
+  ></textarea>
+  <input type="submit" value="Send Reply" class="default" name="_reply" />
+</div>
+
+<div style="margin-top: 16px; border-top: 1px solid #ddd; padding-top: 12px">
+  <h3 style="margin: 0 0 8px 0">WhatsApp Quick Reply</h3>
+  <p style="margin: 0 0 8px 0; color: #666">
+    Enter customer WhatsApp number (with country code, no +), then click a
+    template.
+  </p>
+  <input
+    id="wa_phone"
+    type="text"
+    placeholder="233241234567"
+    style="width: 100%; max-width: 320px; margin-bottom: 8px"
+  />
+  <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px">
+    <button type="button" class="button wa-template" data-template="thanks">
+      Thanks Reply
+    </button>
+    <button type="button" class="button wa-template" data-template="followup">
+      Follow-up Reply
+    </button>
+    <button type="button" class="button wa-template" data-template="booking">
+      Booking Reply
+    </button>
+  </div>
+  <div style="display: flex; gap: 8px; flex-wrap: wrap">
+    <button type="button" class="button default" id="open_whatsapp_btn">
+      Open in WhatsApp
+    </button>
+    <button type="button" class="button" id="copy_whatsapp_btn">
+      Copy WhatsApp Link
+    </button>
+  </div>
+</div>
+
+<div style="margin-top: 16px; border-top: 1px solid #ddd; padding-top: 12px">
+  <h3 style="margin: 0 0 8px 0">Reply History</h3>
+  {% if original.reply_history %} {% for item in original.reply_history reversed %}
+  <div
+    style="
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 4px;
+    "
+  >
+    <div style="font-size: 12px; color: #666; margin-bottom: 6px">
+      Sent by {{ item.sent_by }} on {{ item.sent_at }}
+    </div>
+    <div style="white-space: pre-wrap">{{ item.message }}</div>
+  </div>
+  {% endfor %} {% else %}
+  <p style="margin: 0; color: #666">No replies sent yet.</p>
+  {% endif %}
+</div>
+<script>
+  (function () {
+    const replyBox = document.getElementById("admin_reply");
+    const phoneInput = document.getElementById("wa_phone");
+    const openBtn = document.getElementById("open_whatsapp_btn");
+    const copyBtn = document.getElementById("copy_whatsapp_btn");
+    const customerName = "{{ original.name|default:''|escapejs }}";
+    const subject = "{{ original.subject|default:''|escapejs }}";
+    const templates = {
+      thanks: `Hi ${customerName}, thank you for contacting 734 Hotel. We have received your message about "${subject}" and will assist you shortly.`,
+      followup: `Hi ${customerName}, this is a follow-up from 734 Hotel regarding your message "${subject}". Please share any extra details and we will help right away.`,
+      booking: `Hi ${customerName}, thank you for your interest in booking with 734 Hotel. Please confirm your check-in and check-out dates so we can finalize your request.`,
+    };
+
+    function normalizePhone(raw) {
+      return (raw || "").replace(/\D/g, "");
+    }
+
+    function buildWhatsAppUrl() {
+      const phone = normalizePhone(phoneInput ? phoneInput.value : "");
+      const message = encodeURIComponent(replyBox ? replyBox.value : "");
+
+      if (!phone) {
+        return null;
+      }
+
+      return `https://wa.me/${phone}?text=${message}`;
+    }
+
+    function maybeAutoExtractPhone() {
+      if (!phoneInput || phoneInput.value) return;
+      const messageText = "{{ original.message|default:''|escapejs }}";
+      const match = messageText.match(/(?:\+?\d[\d\s\-]{7,}\d)/);
+      if (match) {
+        phoneInput.value = normalizePhone(match[0]);
+      }
+    }
+
+    document.querySelectorAll(".wa-template").forEach((button) => {
+      button.addEventListener("click", function () {
+        const key = this.getAttribute("data-template");
+        if (replyBox && templates[key]) {
+          replyBox.value = templates[key];
+          replyBox.focus();
+        }
+      });
+    });
+
+    if (openBtn) {
+      openBtn.addEventListener("click", function () {
+        const url = buildWhatsAppUrl();
+        if (!url) {
+          alert("Please enter a WhatsApp number first.");
+          return;
+        }
+        window.open(url, "_blank", "noopener,noreferrer");
+      });
+    }
+
+    if (copyBtn) {
+      copyBtn.addEventListener("click", async function () {
+        const url = buildWhatsAppUrl();
+        if (!url) {
+          alert("Please enter a WhatsApp number first.");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(url);
+          copyBtn.textContent = "Link Copied";
+          setTimeout(() => {
+            copyBtn.textContent = "Copy WhatsApp Link";
+          }, 1600);
+        } catch (error) {
+          const tempInput = document.createElement("input");
+          tempInput.value = url;
+          document.body.appendChild(tempInput);
+          tempInput.select();
+          document.execCommand("copy");
+          document.body.removeChild(tempInput);
+          copyBtn.textContent = "Link Copied";
+          setTimeout(() => {
+            copyBtn.textContent = "Copy WhatsApp Link";
+          }, 1600);
+        }
+      });
+    }
+
+    maybeAutoExtractPhone();
+  })();
+</script>
+{% endif %} 
+{% endblock %}

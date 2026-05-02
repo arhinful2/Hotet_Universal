@@ -1,0 +1,603 @@
+{% extends "admin/base_site.html" %} 
+{% load static %} 
+{% block content %}
+<div class="dashboard">
+  <h1>734 Hotel Admin Dashboard</h1>
+
+  <!-- Statistics Cards -->
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <h3>Total Bookings</h3>
+      <div class="stat-value">{{ total_bookings }}</div>
+      <div class="stat-change positive">
+        +{{ recent_bookings.count }} this week
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <h3>Pending Bookings</h3>
+      <div class="stat-value">{{ pending_bookings }}</div>
+      <a href="/admin/website/booking/?status__exact=pending">View All</a>
+    </div>
+
+    <div class="stat-card">
+      <h3>New Messages</h3>
+      <div class="stat-value">{{ new_messages }}</div>
+      <a href="/admin/website/contactmessage/?status__exact=new">Reply Now</a>
+    </div>
+
+    <div class="stat-card">
+      <h3>Guestbook Entries</h3>
+      <div class="stat-value">{{ guestbook_entries }}</div>
+      <a href="/admin/website/guestbookentry/">Manage</a>
+    </div>
+
+    <div class="stat-card">
+      <h3>Confirmed Bookings</h3>
+      <div class="stat-value">{{ confirmed_bookings }}</div>
+      <a href="/admin/website/booking/?status__exact=confirmed"
+        >View Confirmed</a
+      >
+    </div>
+
+    <div class="stat-card">
+      <h3>Booking Conversion</h3>
+      <div class="stat-value">{{ booking_conversion_rate }}%</div>
+      <div class="stat-change positive">
+        {{ total_bookings }} bookings from {{ total_contacts }} contacts
+      </div>
+    </div>
+  </div>
+
+  <div class="analytics-section">
+    <h2>Top Performing Rooms</h2>
+    <div class="activity-list">
+      {% for room in top_rooms %}
+      <div class="activity-item">
+        <div class="activity-icon booking">
+          <i class="fas fa-hotel"></i>
+        </div>
+        <div class="activity-content">
+          <div class="activity-title">{{ room.name }}</div>
+          <div class="activity-details">
+            {{ room.booking_count }} total bookings
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="activity-item empty">No room booking data yet</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Analytics Charts -->
+  <div class="analytics-section">
+    <h2>Hotel Performance Analytics</h2>
+    <div class="charts-grid">
+      <div class="chart-container">
+        <h3>Monthly Bookings (Last 12 Months)</h3>
+        <canvas id="monthlyChart" width="400" height="200"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Weekly Bookings (Last 4 Weeks)</h3>
+        <canvas id="weeklyChart" width="400" height="200"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Daily Bookings (Last 30 Days)</h3>
+        <canvas id="dailyChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="dashboard-grid">
+    <div class="recent-activity">
+      <h2><i class="fas fa-calendar-check"></i> Recent Bookings</h2>
+      <div class="activity-list">
+        {% for booking in recent_bookings %}
+        <div class="activity-item">
+          <div class="activity-icon booking">
+            <i class="fas fa-bed"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">
+              <a href="/admin/website/booking/{{ booking.id }}/change/">
+                {{ booking.guest_name }} - {{ booking.room.name }}
+              </a>
+            </div>
+            <div class="activity-details">
+              Check-in: {{ booking.check_in }} | Status: {{ booking.get_status_display }}
+            </div>
+            <div class="activity-time">
+              {{ booking.created_at|timesince }} ago
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="activity-item empty">No recent bookings</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="recent-activity">
+      <h2><i class="fas fa-envelope"></i> Recent Messages</h2>
+      <div class="activity-list">
+        {% for message in recent_messages %}
+        <div class="activity-item">
+          <div class="activity-icon message">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">
+              <a href="/admin/website/contactmessage/{{ message.id }}/change/">
+                {{ message.name }}: {{ message.subject }}
+              </a>
+            </div>
+            <div class="activity-details">
+              {{ message.message|truncatechars:100 }}
+            </div>
+            <div class="activity-time">
+              {{ message.created_at|timesince }} ago
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="activity-item empty">No recent messages</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="action-buttons">
+      <a href="/admin/website/booking/add/" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Booking
+      </a>
+      <a href="/admin/website/room/add/" class="btn btn-secondary">
+        <i class="fas fa-hotel"></i> Add Room
+      </a>
+      <a href="/admin/website/herosection/add/" class="btn btn-accent">
+        <i class="fas fa-image"></i> Update Hero
+      </a>
+      <a href="/admin/website/sitesettings/1/change/" class="btn btn-info">
+        <i class="fas fa-cog"></i> Site Settings
+      </a>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <h2>Payment Setup Checklist</h2>
+    <div class="info-grid" style="margin-top: 10px">
+      <div class="info-item">
+        <h3>Payment Settings Created</h3>
+        <p>{% if payment_settings_exists %}✅ Yes{% else %}❌ No{% endif %}</p>
+      </div>
+      <div class="info-item">
+        <h3>Online Payment Enabled</h3>
+        <p>
+          {% if online_payment_enabled %}✅ Enabled{% else %}❌ Disabled{% endif %}
+        </p>
+      </div>
+      <div class="info-item">
+        <h3>Active Providers</h3>
+        <p>
+          {{ active_providers_count }} active / {{ ready_provider_count }} ready
+        </p>
+      </div>
+      <div class="info-item">
+        <h3>Default Provider</h3>
+        <p>
+          {% if default_provider_name %}✅ {{ default_provider_name }}{% else %}❌ Not set{% endif %}
+        </p>
+      </div>
+      <div class="info-item" style="grid-column: 1 / -1">
+        <h3>Overall Payment Readiness</h3>
+        <p>
+          {% if payment_setup_complete %}✅ Ready for guest self-payment{% else %}⚠️ Setup incomplete - finish the steps below{% endif %}
+        </p>
+      </div>
+    </div>
+    <div class="action-buttons" style="margin-top: 15px">
+      <a href="{{ payment_settings_url }}" class="btn btn-primary">
+        <i class="fas fa-sliders-h"></i> Payment Settings
+      </a>
+      <a href="{{ payment_providers_url }}" class="btn btn-secondary">
+        <i class="fas fa-credit-card"></i> Payment Providers
+      </a>
+      <a href="{{ payment_transactions_url }}" class="btn btn-info">
+        <i class="fas fa-receipt"></i> Payment Transactions
+      </a>
+    </div>
+  </div>
+
+  <!-- Site Info -->
+  <div class="site-info">
+    <h2>Site Information</h2>
+    <div class="info-grid">
+      <div class="info-item">
+        <h3>Site Name</h3>
+        <p>{{ site_settings.site_name|default:"734 Hotel" }}</p>
+      </div>
+      <div class="info-item">
+        <h3>Tagline</h3>
+        <p>
+          {{ site_settings.tagline|default:"Your basecamp for good stories" }}
+        </p>
+      </div>
+      <div class="info-item">
+        <h3>Primary Color</h3>
+        <div
+          class="color-box"
+          style="background-color: {{ site_settings.primary_color|default:'#E76F51' }};"
+        ></div>
+      </div>
+      <div class="info-item">
+        <h3>Features Enabled</h3>
+        <p>
+          {% if site_settings.enable_booking %}✅ Booking {% endif %} {% if site_settings.enable_guestbook %}✅ Guestbook {% endif %} {% if site_settings.enable_vibe_check %}✅ Vibe Check {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dashboard {
+    padding: 20px;
+    color: #1f2937;
+  }
+
+  .dashboard h1 {
+    margin-bottom: 30px;
+    color: #111827 !important;
+  }
+
+  .dashboard h2,
+  .dashboard h3,
+  .dashboard p,
+  .dashboard a,
+  .dashboard div,
+  .dashboard span {
+    color: inherit;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 30px 0;
+  }
+
+  .recent-activity {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    border: 1px solid #dbe3ee;
+  }
+
+  .activity-list {
+    margin-top: 15px;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+
+  .activity-icon.booking {
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+
+  .activity-icon.message {
+    background: #f3e5f5;
+    color: #7b1fa2;
+  }
+
+  .activity-content {
+    flex-grow: 1;
+  }
+
+  .activity-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .activity-title a {
+    color: #111827;
+    text-decoration: none;
+  }
+
+  .activity-title a:hover {
+    color: var(--primary-color);
+  }
+
+  .activity-details {
+    font-size: 0.9em;
+    color: #374151;
+    margin-bottom: 5px;
+  }
+
+  .activity-time {
+    font-size: 0.8em;
+    color: #6b7280;
+  }
+
+  .quick-actions {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 30px 0;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    border: 1px solid #dbe3ee;
+  }
+
+  .quick-actions h2,
+  .recent-activity h2,
+  .site-info h2,
+  .analytics-section h2 {
+    color: #111827 !important;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    background: var(--primary-color, #e76f51);
+  }
+
+  .btn-secondary {
+    background: var(--secondary-color, #2a9d8f);
+  }
+
+  .btn-accent {
+    background: var(--accent-color, #e9c46a);
+  }
+
+  .btn-info {
+    background: #17a2b8;
+  }
+
+  .site-info {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    border: 1px solid #dbe3ee;
+  }
+
+  .analytics-section {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 30px 0;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    border: 1px solid #dbe3ee;
+  }
+
+  .analytics-section h2 {
+    margin-bottom: 20px;
+    color: #111827;
+  }
+
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+  }
+
+  .chart-container {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .chart-container h3 {
+    margin-bottom: 15px;
+    color: #1f2937;
+    font-size: 1.1em;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+  }
+
+  .info-item h3 {
+    font-size: 0.9em;
+    color: #374151;
+    margin-bottom: 5px;
+  }
+
+  .info-item p {
+    color: #111827;
+  }
+
+  .stat-card {
+    background: #ffffff;
+    border: 1px solid #dbe3ee;
+  }
+
+  .stat-card h3 {
+    color: #374151 !important;
+  }
+
+  .stat-value {
+    color: #111827 !important;
+  }
+
+  .stat-card a {
+    color: #2563eb !important;
+    font-weight: 500;
+  }
+
+  .activity-item.empty {
+    color: #6b7280;
+  }
+
+  .dashboard canvas {
+    background: #ffffff;
+    border-radius: 6px;
+  }
+
+  .color-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<!-- Chart.js for analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Monthly Bookings Chart
+      const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+      const monthlyData = {{ monthly_bookings|safe }};
+
+      new Chart(monthlyCtx, {
+          type: 'line',
+          data: {
+              labels: monthlyData.map(item => {
+                  const date = new Date(item.month);
+                  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+              }),
+              datasets: [{
+                  label: 'Bookings',
+                  data: monthlyData.map(item => item.count),
+                  borderColor: 'rgb(231, 111, 81)',
+                  backgroundColor: 'rgba(231, 111, 81, 0.1)',
+                  tension: 0.1
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      position: 'top',
+                  },
+                  title: {
+                      display: true,
+                      text: 'Monthly Booking Trends'
+                  }
+              }
+          }
+      });
+
+      // Weekly Bookings Chart
+      const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+      const weeklyData = {{ weekly_bookings|safe }};
+
+      new Chart(weeklyCtx, {
+          type: 'bar',
+          data: {
+              labels: weeklyData.map(item => {
+                  const date = new Date(item.week);
+                  return `Week of ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+              }),
+              datasets: [{
+                  label: 'Bookings',
+                  data: weeklyData.map(item => item.count),
+                  backgroundColor: 'rgba(42, 157, 143, 0.6)',
+                  borderColor: 'rgb(42, 157, 143)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      position: 'top',
+                  },
+                  title: {
+                      display: true,
+                      text: 'Weekly Booking Trends'
+                  }
+              }
+          }
+      });
+
+      // Daily Bookings Chart
+      const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+      const dailyData = {{ daily_bookings|safe }};
+
+      new Chart(dailyCtx, {
+          type: 'line',
+          data: {
+              labels: dailyData.map(item => {
+                  const date = new Date(item.day);
+                  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+              }),
+              datasets: [{
+                  label: 'Bookings',
+                  data: dailyData.map(item => item.count),
+                  borderColor: 'rgb(233, 196, 106)',
+                  backgroundColor: 'rgba(233, 196, 106, 0.1)',
+                  tension: 0.1
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      position: 'top',
+                  },
+                  title: {
+                      display: true,
+                      text: 'Daily Booking Trends'
+                  }
+              }
+          }
+      });
+  });
+</script>
+{% endblock %}

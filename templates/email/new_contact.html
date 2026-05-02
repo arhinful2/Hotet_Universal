@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #E76F51; color: white; padding: 20px; text-align: center; }
+        .content { padding: 30px; background: #f9f9f9; }
+        .message-details { background: white; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>New Contact Message</h1>
+        </div>
+        
+        <div class="content">
+            <div class="message-details">
+                <p><strong>From:</strong> {{ contact.name }}</p>
+                <p><strong>Email:</strong> {{ contact.email }}</p>
+                <p><strong>Subject:</strong> {{ contact.subject }}</p>
+                <p><strong>Message:</strong><br>{{ contact.message }}</p>
+                <p><strong>Received:</strong> {{ contact.created_at }}</p>
+            </div>
+            
+            <p>
+                <a href="http://{{ domain }}/admin/website/contactmessage/{{ contact.id }}/change/" 
+                   style="background: #2A9D8F; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                   Reply in Admin Portal
+                </a>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>734 Hotel Contact System</p>
+            <p>This is an automated notification. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

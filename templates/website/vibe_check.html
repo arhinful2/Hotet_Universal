@@ -1,0 +1,48 @@
+{% load static %}
+{% if site_settings.enable_vibe_check %}
+<div class="container">
+    <div class="section-title">
+        <h2 class="handwriting">Vibe Check</h2>
+        <br>
+        <br>
+        <p>Click the polaroids to experience our hostel vibe</p>
+    </div>
+    
+    <div class="polaroid-gallery">
+        {% for vibe in vibe_items %}
+        <div class="polaroid" data-item-id="{{ vibe.id }}" style="--rotate: {{ forloop.counter|divisibleby:2|yesno:'2,-2' }}deg">
+            <img src="{{ vibe.image.url }}" alt="{{ vibe.title }}" loading="lazy">
+            <h3>{{ vibe.title }}</h3>
+        </div>
+        {% empty %}
+        <div class="polaroid" style="--rotate: -2deg">
+            <img src="{% static 'images/default-vibe.jpg' %}" alt="Cozy Bunk" loading="lazy">
+            <h3>The Cozy Bunk</h3>
+        </div>
+        <div class="polaroid" style="--rotate: 2deg">
+            <img src="{% static 'images/default-kitchen.jpg' %}" alt="Shared Kitchen" loading="lazy">
+            <h3>The Shared Kitchen</h3>
+        </div>
+        <div class="polaroid" style="--rotate: -1deg">
+            <img src="{% static 'images/default-rooftop.jpg' %}" alt="Rooftop Sunset" loading="lazy">
+            <h3>The Rooftop Sunset</h3>
+        </div>
+        <div class="polaroid" style="--rotate: 1deg">
+            <img src="{% static 'images/default-gamenight.jpg' %}" alt="Game Night" loading="lazy">
+            <h3>The Game Night</h3>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="audio-player">
+        <audio id="vibe-audio-player" controls style="display: none;">
+            <source src="" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <div class="guest-note" id="guest-note-container" style="opacity: 0;">
+            <div class="guest-note-text" id="guest-note"></div>
+            <div class="guest-info" id="guest-info"></div>
+        </div>
+    </div>
+</div>
+{% endif %}

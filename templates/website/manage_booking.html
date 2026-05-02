@@ -1,0 +1,111 @@
+{% extends "base.html" %} 
+{% block title %}Manage Booking{% endblock %} 
+{% block
+content %}
+<div class="container manage-booking-layout">
+  <div class="section-title section-title--tight">
+    <h2>Manage Your Booking</h2>
+    <p class="section-subtitle">Use this private page to modify dates, cancel, or complete payment.</p>
+  </div>
+
+  <div class="booking-widget manage-booking-panel">
+    <h3>Booking #{{ booking.id }}</h3>
+    <p>
+      <strong>Guest:</strong> {{ booking.guest_name }} ({{ booking.guest_email }})
+    </p>
+    <p><strong>Room:</strong> {{ booking.room.name }}</p>
+    <p>
+      <strong>Stay:</strong> {{ booking.check_in }} → {{ booking.check_out }}
+    </p>
+    <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+    <p>
+      <strong>Total:</strong> {{ booking.total_price|default:booking.room.price_per_night }} {{ payment_settings.default_currency|default:'GHS' }}
+    </p>
+  </div>
+
+  <div class="booking-widget manage-booking-panel">
+    <h3>Modify Booking</h3>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="modify" />
+      {{ manage_form.non_field_errors }}
+      <div class="manage-booking-grid">
+        <div>
+          <label>Check-in</label>
+          {{ manage_form.check_in }}
+        </div>
+        <div>
+          <label>Check-out</label>
+          {{ manage_form.check_out }}
+        </div>
+      </div>
+      <div class="manage-booking-field">
+        <label>Guests</label>
+        {{ manage_form.number_of_guests }}
+      </div>
+      <div class="manage-booking-field">
+        <label>Special requests</label>
+        {{ manage_form.special_requests }}
+      </div>
+      <button type="submit" class="btn btn-primary manage-booking-submit">
+        Save Changes
+      </button>
+    </form>
+  </div>
+
+  <div class="booking-widget manage-booking-panel">
+    <h3>Online Payment</h3>
+    {% if payment_settings and payment_settings.enable_online_payment %} {% if active_providers %}
+    <p>Select your preferred provider:</p>
+    <div class="manage-booking-providers">
+      {% for provider in active_providers %}
+      <form
+        method="post"
+        action="{% url 'initiate_booking_payment' booking.guest_access_token provider.id %}"
+      >
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline">
+          Pay with {{ provider.display_name }}
+        </button>
+      </form>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p>No active payment provider configured by admin yet.</p>
+    {% endif %} {% if latest_payment %}
+    <p class="manage-booking-note">
+      <strong>Latest payment:</strong> {{ latest_payment.reference }} ({{ latest_payment.get_status_display }})
+    </p>
+    {% endif %} {% else %}
+    <p>Online payment is currently disabled by admin.</p>
+    {% endif %}
+  </div>
+
+  <div class="booking-widget">
+    <h3>Cancel Booking</h3>
+    <form
+      method="post"
+      onsubmit="
+        return confirm('Are you sure you want to cancel this booking?');
+      "
+    >
+      {% csrf_token %}
+      <input type="hidden" name="action" value="cancel" />
+      <div>
+        <label>Reason (optional)</label>
+        <textarea
+          name="cancellation_reason"
+          class="form-control"
+          rows="3"
+        ></textarea>
+      </div>
+      <button
+        type="submit"
+        class="btn btn-outline manage-booking-cancel"
+      >
+        Cancel Booking
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

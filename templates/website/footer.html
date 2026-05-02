@@ -1,0 +1,167 @@
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <!-- Hotel Info -->
+            <div class="footer-info">
+                {% if site_settings.logo %}
+                    <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}" style="max-width: 150px; margin-bottom: 1rem;">
+                {% else %}
+                    <h3 class="handwriting" style="color: white; margin-bottom: 1rem;">734 Hotel</h3>
+                {% endif %}
+                <p style="color: rgba(255,255,255,0.8);">{{ site_settings.tagline|default:"Your basecamp for good stories" }}</p>
+                
+                <!-- Common Room Counter -->
+                <div class="common-room-counter">
+                    <i class="fas fa-users"></i>
+                    <span id="current-travelers">Loading...</span> travelers in the common room
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="{% url 'index' %}#rooms">Our Rooms</a>
+                <a href="{% url 'index' %}#neighborhood">Neighborhood</a>
+                <a href="{% url 'index' %}#guestbook">Guestbook</a>
+                <a href="{% url 'index' %}#contact">Contact Us</a>
+                <a href="{% url 'index' %}#booking">Book Now</a>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="footer-contact">
+                <h4>Contact Us</h4>
+                <p><i class="fas fa-map-marker-alt"></i> 734 Adventure Street, Travel City</p>
+                <p><i class="fas fa-phone"></i> +1 (234) 567-8900</p>
+                <p><i class="fas fa-envelope"></i> hello@734hotel.com</p>
+            </div>
+            
+            <!-- Social Media -->
+            <div class="footer-social">
+                <h4>Follow Our Journey</h4>
+                <div class="social-links">
+                    {% for social in social_media %}
+                        <a href="{{ social.url }}" target="_blank" class="social-icon">
+                            <i class="fab fa-{{ social.platform }}"></i>
+                        </a>
+                    {% empty %}
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-tripadvisor"></i></a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Copyright -->
+        <div class="footer-bottom">
+            <p>&copy; {% now "Y" %} {{ site_settings.site_name|default:"734 Hotel" }}. All stories welcome.</p>
+            <p style="font-size: 0.9rem; opacity: 0.7;">
+                Designed with <i class="fas fa-heart" style="color: #E76F51;"></i> for travelers worldwide
+            </p>
+        </div>
+    </div>
+</footer>
+
+<style>
+.footer {
+    background: var(--text-color, #264653);
+    color: white;
+    padding: 3rem 0 1rem;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 3rem;
+    margin-bottom: 2rem;
+}
+
+.footer-info, .footer-links, .footer-contact, .footer-social {
+    margin-bottom: 1rem;
+}
+
+.footer h4 {
+    color: white;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.footer-links a {
+    display: block;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--accent-color, #E9C46A);
+}
+
+.footer-contact p {
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.footer-contact i {
+    margin-right: 10px;
+    margin-top: 3px;
+    color: var(--accent-color, #E9C46A);
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.social-icon:hover {
+    background: var(--primary-color, #E76F51);
+    transform: translateY(-3px);
+}
+
+.common-room-counter {
+    font-size: 1rem;
+    text-align: left;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+}
+
+.common-room-counter i {
+    color: var(--accent-color, #E9C46A);
+    margin-right: 8px;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+</style>

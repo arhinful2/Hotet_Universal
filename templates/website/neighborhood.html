@@ -1,0 +1,75 @@
+{% if site_settings.enable_map %}
+<div class="container">
+    <div class="section-title section-title--inverse section-title--tight">
+        <h2>Explore the Neighborhood</h2>
+        <br>
+        <br>
+        <p class="section-subtitle section-subtitle--light">Discover local gems around 734 Hotel.</p>
+    </div>
+    
+    <div id="neighborhood-map" class="neighborhood-map"></div>
+    
+    <div class="map-points-list">
+        {% for point in neighborhood_points|slice:":6" %}
+        <div class="map-point" style="border-left-color: {{ point.color }};">
+            <div class="point-icon">
+                {% if point.point_type == 'food' %}
+                <i class="fas fa-utensils"></i>
+                {% elif point.point_type == 'entertainment' %}
+                <i class="fas fa-film"></i>
+                {% elif point.point_type == 'culture' %}
+                <i class="fas fa-landmark"></i>
+                {% elif point.point_type == 'shopping' %}
+                <i class="fas fa-shopping-bag"></i>
+                {% elif point.point_type == 'nature' %}
+                <i class="fas fa-tree"></i>
+                {% else %}
+                <i class="fas fa-subway"></i>
+                {% endif %}
+            </div>
+            <h4>{{ point.title }}</h4>
+            <p>{{ point.description|truncatechars:100 }}</p>
+            <small>{{ point.get_point_type_display }}</small>
+        </div>
+        {% empty %}
+        <!-- Default points if none exist -->
+        <div class="map-point">
+            <div class="point-icon"><i class="fas fa-utensils"></i></div>
+            <h4>Midnight Tacos</h4>
+            <p>Best late-night tacos in the city. Open until 3 AM.</p>
+            <small>Food & Drink</small>
+        </div>
+        <div class="map-point">
+            <div class="point-icon"><i class="fas fa-music"></i></div>
+            <h4>Hidden Jazz Bar</h4>
+            <p>Intimate jazz club with live music every night.</p>
+            <small>Entertainment</small>
+        </div>
+        <div class="map-point">
+            <div class="point-icon"><i class="fas fa-wifi"></i></div>
+            <h4>Brew & Work Cafe</h4>
+            <p>Artisan coffee with fast free WiFi. Perfect for digital nomads.</p>
+            <small>Food & Drink</small>
+        </div>
+        <div class="map-point">
+            <div class="point-icon"><i class="fas fa-palette"></i></div>
+            <h4>Street Art Alley</h4>
+            <p>Colorful murals and rotating art installations.</p>
+            <small>Cultural</small>
+        </div>
+        <div class="map-point">
+            <div class="point-icon"><i class="fas fa-park"></i></div>
+            <h4>Sunset Park</h4>
+            <p>Beautiful green space with stunning city views.</p>
+            <small>Nature</small>
+        </div>
+        <div class="map-point">
+            <div class="point-icon"><i class="fas fa-train"></i></div>
+            <h4>Central Station</h4>
+            <p>Main transportation hub connecting to all city lines.</p>
+            <small>Transport</small>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

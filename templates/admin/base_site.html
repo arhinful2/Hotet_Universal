@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('734 Hotel Admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        {% if site_settings.logo %}
+            <img src="{{ site_settings.logo.url }}" height="40px" style="vertical-align: middle; margin-right: 10px;">
+        {% endif %}
+        734 Hotel Admin Portal
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}
+<div class="admin-nav-extras">
+    <a href="{% url 'admin:index' %}" class="dashboard-link">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <div class="notification-bell" id="notification-bell">
+        <i class="fas fa-bell"></i>
+        {% if admin_unread_count > 0 %}
+        <span class="notification-badge">{{ admin_unread_count }}</span>
+        {% endif %}
+        <div class="notification-dropdown" id="notification-dropdown">
+            <div class="notification-header">Notifications</div>
+            <div class="notification-items">
+                {% for notification in admin_recent_notifications %}
+                <div class="notification-item {% if not notification.is_read %}unread{% endif %}" 
+                     data-notification-id="{{ notification.id }}">
+                    <div class="notification-type">{{ notification.get_notification_type_display }}</div>
+                    <div class="notification-message">{{ notification.title }}</div>
+                    <div class="notification-time">{{ notification.created_at|timesince }} ago</div>
+                </div>
+                {% empty %}
+                <div class="notification-item empty">No new notifications</div>
+                {% endfor %}
+            </div>
+            <a href="/admin/website/notification/" class="view-all-link">View All</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/admin_custom.css' %}">
+<style>
+:root {
+    --primary-color: {{ site_settings.primary_color|default:'#E76F51' }};
+    --secondary-color: {{ site_settings.secondary_color|default:'#2A9D8F' }};
+    --accent-color: {{ site_settings.accent_color|default:'#E9C46A' }};
+}
+</style>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Notification bell functionality
+    const bell = document.getElementById('notification-bell');
+    const dropdown = document.getElementById('notification-dropdown');
+    
+    if (bell) {
+        bell.addEventListener('click', function(e) {
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            e.stopPropagation();
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            dropdown.style.display = 'none';
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Payment Status{% endblock %}
+{% block content %}
+<div class="container payment-result-layout">
+  <div class="payment-result-hero booking-widget payment-result-panel">
+    <span class="section-eyebrow {% if result_ok %}section-eyebrow--light{% endif %}">
+      Payment update
+    </span>
+    <h1>{{ result_title }}</h1>
+    <p class="payment-result-message">{{ result_message }}</p>
+
+    <div class="payment-status-chip {% if result_ok %}payment-status-chip--success{% else %}payment-status-chip--neutral{% endif %}">
+      {% if result_ok %}
+      <i class="fas fa-circle-check"></i>
+      Confirmed
+      {% else %}
+      <i class="fas fa-clock"></i>
+      Pending review
+      {% endif %}
+    </div>
+
+    {% if booking %}
+    <div class="payment-result-grid">
+      <div class="payment-result-item">
+        <span>Booking</span>
+        <strong>#{{ booking.id }}</strong>
+      </div>
+      <div class="payment-result-item">
+        <span>Room</span>
+        <strong>{{ booking.room.name }}</strong>
+      </div>
+      <div class="payment-result-item">
+        <span>Status</span>
+        <strong>{{ booking.get_status_display }}</strong>
+      </div>
+      {% if booking.total_price %}
+      <div class="payment-result-item">
+        <span>Total</span>
+        <strong>₵{{ booking.total_price }}</strong>
+      </div>
+      {% endif %}
+      {% if booking.check_in and booking.check_out %}
+      <div class="payment-result-item">
+        <span>Stay</span>
+        <strong>{{ booking.check_in|date:"M j, Y" }} to {{ booking.check_out|date:"M j, Y" }}</strong>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="payment-result-summary">
+      {% if result_ok %}
+      Your booking is now tied to a confirmed payment. You can review or update it anytime from your private booking page.
+      {% else %}
+      Your booking details are safe. If this payment was just submitted, wait a moment for the provider or admin review to finish.
+      {% endif %}
+    </div>
+
+    <div class="result-actions">
+      <a class="btn btn-primary" href="{% url 'manage_booking' booking.guest_access_token %}">
+        Back to Booking Management
+      </a>
+      <a class="btn btn-outline" href="{% url 'index' %}#booking">Make Another Booking</a>
+    </div>
+    {% else %}
+    <div class="payment-result-summary">
+      You can return to the home page or open the booking section again if you want to start a new reservation.
+    </div>
+    <div class="result-actions">
+      <a class="btn btn-primary" href="{% url 'index' %}">Back to Home</a>
+      <a class="btn btn-outline" href="{% url 'index' %}#booking">Open Booking Form</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

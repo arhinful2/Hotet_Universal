@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<!-- Hero Section -->
+<section id="home" class="hero-section">
+  {% include 'website/hero_section.html' %}
+</section>
+
+<!-- Rooms Section -->
+<section id="rooms" class="section rooms-section">
+  {% include 'website/rooms.html' %}
+</section>
+
+<!-- Services Section -->
+<section id="services" class="section services-section">
+  {% include 'website/services.html' %}
+</section>
+
+<!-- Vibe Check Section -->
+{% if site_settings.enable_vibe_check %}
+<section id="vibe" class="section vibe-check-section">
+  {% include 'website/vibe_check.html' %}
+</section>
+{% endif %}
+
+<!-- Neighborhood Section -->
+{% if site_settings.enable_map %}
+<section id="neighborhood" class="section map-section">
+  {% include 'website/neighborhood.html' %}
+</section>
+{% endif %}
+
+<!-- Guestbook Section -->
+{% if site_settings.enable_guestbook %}
+<section id="guestbook" class="section guestbook-section">
+  {% include 'website/guestbook.html' %}
+</section>
+{% endif %}
+
+<!-- Booking Section -->
+{% if site_settings.enable_booking %}
+<section id="booking" class="section booking-section">
+  {% include 'website/booking.html' %}
+</section>
+{% endif %}
+
+<!-- Contact Section -->
+<section id="contact" class="section contact-section">
+  {% include 'website/contact.html' %}
+</section>
+{% endblock %}

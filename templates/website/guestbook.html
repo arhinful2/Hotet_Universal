@@ -1,0 +1,72 @@
+{% if site_settings.enable_guestbook %}
+<div class="container">
+    <div class="section-title">
+        <h2 style="color: white;">Guestbook Wall</h2>
+        <br>
+        <br>
+        <p style="color: rgba(255,255,255,0.8);">Read what our travelers have to say</p>
+    </div>
+    
+    <div class="guestbook-wall">
+        {% for entry in guestbook_entries|slice:":12" %}
+        <div class="sticky-note" style="background-color: {{ entry.color|default:'#E9C46A' }}; --rotate: {{ forloop.counter|divisibleby:2|yesno:'1,-1' }}deg">
+            <h4>{{ entry.name }}</h4>
+            <div class="hometown">{{ entry.hometown }}</div>
+            <div class="message">{{ entry.message|truncatechars:200 }}</div>
+            <div class="date">{{ entry.created_at|date:"M d, Y" }}</div>
+        </div>
+        {% empty %}
+        <!-- Default entries if none exist -->
+        <div class="sticky-note" style="--rotate: -1deg">
+            <h4>Sarah M.</h4>
+            <div class="hometown">Toronto, Canada</div>
+            <div class="message">The best hostel experience I've ever had! Met amazing people and the staff felt like family.</div>
+            <div class="date">Feb 15, 2024</div>
+        </div>
+        <div class="sticky-note" style="--rotate: 1deg">
+            <h4>Carlos R.</h4>
+            <div class="hometown">Barcelona, Spain</div>
+            <div class="message">The rooftop sunset views are incredible! Perfect place to unwind after a day of exploring.</div>
+            <div class="date">Feb 10, 2024</div>
+        </div>
+        <div class="sticky-note" style="--rotate: -2deg">
+            <h4>Aisha K.</h4>
+            <div class="hometown">Nairobi, Kenya</div>
+            <div class="message">The family dinners were the highlight of my stay. Such a warm, welcoming community!</div>
+            <div class="date">Jan 28, 2024</div>
+        </div>
+        <div class="sticky-note" style="--rotate: 2deg">
+            <h4>Leo T.</h4>
+            <div class="hometown">Melbourne, Australia</div>
+            <div class="message">As a solo traveler, I felt completely safe and welcomed here. Can't wait to come back!</div>
+            <div class="date">Jan 15, 2024</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="guestbook-form-container" style="max-width: 600px; margin: 3rem auto;">
+        <h3 style="color: white; text-align: center; margin-bottom: 1.5rem;">Leave Your Mark</h3>
+        <form id="guestbook-form" method="post" action="{% url 'submit_guestbook' %}">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <input type="text" name="name" class="form-control" placeholder="Your name" required>
+                </div>
+                <div>
+                    <input type="text" name="hometown" class="form-control" placeholder="Your city, country" required>
+                </div>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <textarea name="message" class="form-control" rows="3" placeholder="What was your favorite moment here? What made your stay special?" required></textarea>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <label style="color: white; margin-right: 10px;">Note color:</label>
+                    <input type="color" name="color" value="#E9C46A" title="Choose a sticky note color">
+                </div>
+                <button type="submit" class="btn btn-primary">Pin Your Note</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}

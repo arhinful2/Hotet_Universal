@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}{{ seo_title|default:site_settings.site_name|default:"734 Hotel" }}{% endblock %}
+    </title>
+    <meta
+      name="description"
+      content="{{ seo_description|default:site_settings.meta_description|default:site_settings.tagline|default:'734 Hotel - Your basecamp for good stories' }}"
+    />
+    <meta
+      name="keywords"
+      content="{{ seo_keywords|default:site_settings.meta_keywords|default:'hotel,booking,travel,rooms,guesthouse' }}"
+    />
+    <meta name="robots" content="{{ seo_robots|default:'index, follow' }}" />
+
+    {% if seo_canonical_url %}
+    <link rel="canonical" href="{{ seo_canonical_url }}" />
+    {% elif request %}
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+    {% endif %}
+
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="{{ seo_og_title|default:seo_title|default:site_settings.site_name|default:'734 Hotel' }}"
+    />
+    <meta
+      property="og:description"
+      content="{{ seo_og_description|default:seo_description|default:site_settings.meta_description|default:site_settings.tagline|default:'734 Hotel - Your basecamp for good stories' }}"
+    />
+    {% if seo_og_image %}
+    <meta property="og:image" content="{{ seo_og_image.url }}" />
+    {% elif site_settings.og_image %}
+    <meta property="og:image" content="{{ site_settings.og_image.url }}" />
+    {% elif site_settings.logo %}
+    <meta property="og:image" content="{{ site_settings.logo.url }}" />
+    {% endif %}
+    <meta
+      name="twitter:card"
+      content="{{ seo_twitter_card|default:'summary_large_image' }}"
+    />
+    <meta
+      name="twitter:title"
+      content="{{ seo_og_title|default:seo_title|default:site_settings.site_name|default:'734 Hotel' }}"
+    />
+    <meta
+      name="twitter:description"
+      content="{{ seo_og_description|default:seo_description|default:site_settings.meta_description|default:site_settings.tagline|default:'734 Hotel - Your basecamp for good stories' }}"
+    />
+    {% if seo_og_image %}
+    <meta name="twitter:image" content="{{ seo_og_image.url }}" />
+    {% elif site_settings.og_image %}
+    <meta name="twitter:image" content="{{ site_settings.og_image.url }}" />
+    {% elif site_settings.logo %}
+    <meta name="twitter:image" content="{{ site_settings.logo.url }}" />
+    {% endif %}
+
+    <!-- Dynamic CSS -->
+    <link rel="stylesheet" href="{% url 'dynamic_css' %}" />
+
+    <!-- Static CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/admin_custom.css' %}" />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    {% if site_settings.favicon %}
+    <link
+      rel="icon"
+      href="{{ site_settings.favicon.url }}"
+      type="image/x-icon"
+    />
+    {% endif %}
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Datepicker -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+
+    <!-- Leaflet Map CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    
+    <!-- Referrer Policy for OpenStreetMap -->
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+
+    {% block extra_css %} 
+    {% endblock %}
+  </head>
+  <body
+    class="{% if enable_animations %}animations-enabled{% endif %} layout-{{ site_settings.layout_style|default:'cozy' }}"
+  >
+    <!-- Navigation -->
+    <nav class="main-nav">
+      <div class="container">
+        <div class="nav-content">
+          <!-- Logo (Admin Controlled) -->
+          <a href="{% url 'index' %}#home" class="logo">
+            {% if site_settings.logo %}
+            <img
+              src="{{ site_settings.logo.url }}"
+              alt="{{ site_settings.site_name }}"
+              class="nav-logo"
+              title="{{ site_settings.site_name }}"
+            />
+            {% else %}
+            <span class="logo-text handwriting">{{ site_settings.site_name|default:'734 Hotel' }}</span>
+            {% endif %}
+          </a>
+
+          <!-- Navigation Links -->
+          <div class="nav-links" id="nav-links">
+            <a href="{% url 'index' %}#home">Home</a>
+            <a href="{% url 'index' %}#rooms">Rooms</a>
+            <a href="{% url 'index' %}#services">Services</a>
+            <a href="{% url 'index' %}#vibe">Vibe Check</a>
+            <a href="{% url 'index' %}#neighborhood">Neighborhood</a>
+            <a href="{% url 'index' %}#guestbook">Guestbook</a>
+            <a href="{% url 'index' %}#booking">Book Now</a>
+            <a href="{% url 'index' %}#contact">Contact</a>
+          </div>
+
+          <!-- Mobile Menu Toggle -->
+          <div class="nav-toggle" id="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <!-- Social Media Icons -->
+          <div class="nav-social">
+            {% for social in social_media %}
+            <a href="{{ social.url }}" target="_blank" class="social-icon">
+              <i class="fab fa-{{ social.platform }}"></i>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+      {% block content %}
+      <!-- Content will be inserted here by child templates -->
+      {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% include 'website/footer.html' %}
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/animations.js' %}"></script>
+
+    <!-- Dynamic JavaScript based on settings -->
+    <script>
+      // Animation settings
+      const ANIMATION_SETTINGS = {
+          enabled: {% if enable_animations %}true{% else %}false{% endif %},
+          speed: '{{ site_settings.animation_speed|default:"normal" }}',
+          motionLevel: '{{ site_settings.motion_intensity|default:"balanced" }}',
+          scrollSmoothness: '{{ site_settings.scroll_smoothness|default:"normal" }}'
+      };
+
+      // Feature toggles
+      const FEATURES = {
+          vibeCheck: {% if site_settings.enable_vibe_check %}true{% else %}false{% endif %},
+          guestbook: {% if site_settings.enable_guestbook %}true{% else %}false{% endif %},
+          booking: {% if site_settings.enable_booking %}true{% else %}false{% endif %},
+          map: {% if site_settings.enable_map %}true{% else %}false{% endif %},
+          datepicker: {% if site_settings.enable_datepicker %}true{% else %}false{% endif %}
+      };
+    </script>
+
+    {% block extra_js %}
+    {% endblock %}
+  </body>
+</html>

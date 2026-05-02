@@ -1,0 +1,116 @@
+<div class="container">
+    <div class="section-title">
+        <h2>Get in Touch</h2>
+        <br>
+        <br>
+
+        <p>Have questions? We're here to help!</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; margin-top: 2rem;">
+        <div class="contact-info">
+            <h3>Contact Information</h3>
+            <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <h4>Address</h4>
+                    <p>734 Adventure Street<br>Travel City, TC 10001</p>
+                </div>
+            </div>
+            
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <div>
+                    <h4>Phone</h4>
+                    <p>+1 (234) 567-8900</p>
+                </div>
+            </div>
+            
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <div>
+                    <h4>Email</h4>
+                    <p>hello@734hotel.com</p>
+                </div>
+            </div>
+            
+            <div class="contact-item">
+                <i class="fas fa-clock"></i>
+                <div>
+                    <h4>Reception Hours</h4>
+                    <p>24/7 - We're always here for you!</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="contact-form">
+            <h3>Send us a Message</h3>
+            <form id="contact-form" method="post" action="{% url 'submit_contact' %}">
+                {% csrf_token %}
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        {{ contact_form.name }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        {{ contact_form.email }}
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Subject</label>
+                    {{ contact_form.subject }}
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label>Message</label>
+                    {{ contact_form.message }}
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Send Inquiry
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.contact-item i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-right: 1rem;
+    margin-top: 0.25rem;
+}
+
+.contact-item h4 {
+    margin: 0 0 0.25rem 0;
+    color: #333;
+}
+
+.contact-item p {
+    margin: 0;
+    color: #666;
+}
+
+.contact-info, .contact-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.contact-info h3, .contact-form h3 {
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+</style>
